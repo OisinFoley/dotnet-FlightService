@@ -12,6 +12,7 @@ namespace FlightsService.Data
         {
         }
 
+        public DbSet<Message> Messages { get; set; }
         public DbSet<Flight> Flights { get; set; }
 
         async Task<int> IUnitOfWork.SaveChangesAsync()
