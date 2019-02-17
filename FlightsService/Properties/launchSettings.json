@@ -18,11 +18,7 @@
     },
     "FlightsService": {
       "commandName": "Project",
-      "launchBrowser": false,
       "launchUrl": "api/v1/flights",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      },
       "applicationUrl": "http://localhost:5000/"
     }
   }

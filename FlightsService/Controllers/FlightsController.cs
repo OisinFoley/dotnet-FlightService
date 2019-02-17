@@ -9,7 +9,6 @@ using FlightsService.Data.Abstract;
 using Microsoft.AspNetCore.Http;
 using FlightsService.ApiResponses;
 using FlightsService.DTOs;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace FlightsService.Controllers
 {

@@ -8,11 +8,8 @@ namespace FlightsService.Data
     {
         public static void SetContextOptions(DbContextOptionsBuilder optionsBuilder, IConfiguration configuration)
         {
-            switch (configuration["DatabaseProvider"])
+            switch (configuration["DatabaseHost"])
             {
-                case "SQLite":
-                    optionsBuilder.UseSqlite(configuration.GetConnectionString("SQLite"));
-                    break;
                 case "SQLServer":
                     optionsBuilder.UseSqlServer(configuration.GetConnectionString("SQLServer"));
                     break;
