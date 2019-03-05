@@ -24,7 +24,6 @@ namespace FlightsService.Extensions
             if (existingFlight == null)
                 return new Flight
                 {
-                    Id = dto.Id,
                     DepartureLocation = dto.DepartureLocation,
                     ArrivalLocation = dto.ArrivalLocation,
                     Date = dto.Date,

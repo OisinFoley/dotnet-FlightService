@@ -15,12 +15,10 @@ namespace FlightsService.BackgroundWorker
         private readonly IEventReceiver<EventMessage<Booking>> m_EventReceiver;
         private readonly ILogger m_Logger;
         private readonly IFlightRepository m_FlightRepository;
-        private readonly IMessageRepository m_MessageRepository;
 
-        public IncomingMessageService(ILogger<IncomingMessageService<T>> logger, IMessageRepository messageRepository, IEventReceiver<EventMessage<Booking>> receiver, IFlightRepository flightRepository)
+        public IncomingMessageService(ILogger<IncomingMessageService<T>> logger, IEventReceiver<EventMessage<Booking>> receiver, IFlightRepository flightRepository)
         {
             m_Logger = logger;
-            m_MessageRepository = messageRepository;
             m_FlightRepository = flightRepository;
 
             m_Logger.LogInformation($"IncomingMessageService initialising.");
@@ -86,5 +84,6 @@ namespace FlightsService.BackgroundWorker
                 return false;
             }
         }
+
     }
 }
