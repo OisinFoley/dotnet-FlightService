@@ -1,6 +1,7 @@
 FlightsService/bin
 FlightsService/obj
-FlightsService/FlightsService.csproj
 FlightsService/appsettings.json
 FlightsService/appsettings.Development.json
+FlightsService.Tests/obj
+FlightsService.Tests/bin
 .vs/

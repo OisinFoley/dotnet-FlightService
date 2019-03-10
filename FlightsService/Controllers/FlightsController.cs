@@ -43,7 +43,12 @@ namespace FlightsService.Controllers
             if (basePrice > 0)
                 flights = flights.Where(f => f.BasePrice <= (basePrice));
 
-            return Ok(flights);
+            var response = new FlightsResponse
+            {
+                Flights = flights.Select(flight => flight.ToFlightDto())
+            };
+
+            return Ok(response);
         }
 
         // GET api/v1/flights/{flightId}
@@ -53,17 +58,14 @@ namespace FlightsService.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Get(Guid id)
         {
-            if (id == null)
+            if (id == Guid.Empty)
             {
-                return BadRequest();
+                return new BadRequestResult();
             }
-
 
             Flight flight = await m_FlightRepository.FindAsync(id);
             if (flight == null)
-            {
                 return NotFound();
-            }
 
             var response = new FlightResponse { Flight = flight.ToFlightDto() };
             return Ok(response);
