@@ -1,3 +1,4 @@
+using FlightsService.ApiRequests;
 using FlightsService.ApiResponses;
 using FlightsService.Controllers;
 using FlightsService.Data.Abstract;
@@ -60,7 +61,7 @@ namespace FlightsService.Tests
                 .Returns(m_Flights);
 
             m_FlightRepository.FindAsync(Arg.Any<object[]>())
-                .Returns(x => m_FlightRepository.Flights.SingleOrDefault(booking => booking.Id == (Guid)x.Arg<object[]>()[0]));
+                .Returns(x => m_FlightRepository.Flights.SingleOrDefault(flight => flight.Id == (Guid)x.Arg<object[]>()[0]));
 
             m_FlightRepository.InsertAsync(Arg.Any<Flight>())
                 .Returns(x => x.Arg<Flight>())
@@ -213,9 +214,6 @@ namespace FlightsService.Tests
 
             var response = Assert.IsType<FlightResponse>((parsedResult.Value));
 
-            //FlightDto flight2 = response.Flights.Single(x => x.Id.ToString() == Guid2);
-            
-
             FlightDto flight2 = response.Flight;
             Assert.Equal(DepartureLocation2, flight2.DepartureLocation);
             Assert.Equal(ArrivalLocation2, flight2.ArrivalLocation);
@@ -223,11 +221,206 @@ namespace FlightsService.Tests
             Assert.Equal(AvailableSeats2, flight2.AvailableSeats);
             Assert.Equal(Date2, flight2.Date);
             Assert.Equal(BasePrice2, flight2.BasePrice);
+        }
 
-            //Assert.Equal(CustomerId2, flight2.CustomerId.ToString());
-            //Assert.Equal(FlightId2, flight2.FlightId.ToString());
-            //Assert.Equal(PriceWhenBooked2, flight2.PriceWhenBooked);
-            //Assert.Equal(SeatNumber2, flight2.SeatNumber);
+        #endregion
+
+        #region PostFlight
+
+        [Fact]
+        public async Task PostReturnsOkObjectResultWhenFlightIsAdded()
+        {
+            // Arrange
+            var flightController = new FlightsController(m_FlightRepository);
+            var flightDto = new FlightDto { Id = new Guid(Guid3),
+                DepartureLocation = DepartureLocation3,
+                ArrivalLocation = ArrivalLocation3,
+                Date = Date3,
+                BasePrice = BasePrice3,
+                AvailableSeats = AvailableSeats3,
+                IsSpecialOffer = IsSpecialOffer3
+            };
+            var flightRequest = new FlightRequest { Flight = flightDto };
+
+            // Act
+            IActionResult result = await flightController.Post(flightRequest).ConfigureAwait(false);
+            var parsedResult = result as OkObjectResult;
+
+            // Assert
+            Assert.IsType<OkObjectResult>(result);
+            Assert.True(parsedResult.StatusCode == 200);
+
+            var response = Assert.IsType<FlightResponse>((parsedResult.Value));
+            var flightResponse = Assert.IsType<FlightDto>(response.Flight);
+            Assert.NotEqual(Guid.Empty, flightResponse.Id);
+            Assert.Equal(DepartureLocation3, flightResponse.DepartureLocation);
+            Assert.Equal(ArrivalLocation3, flightResponse.ArrivalLocation);
+            Assert.Equal(Date3, flightResponse.Date);
+            Assert.Equal(BasePrice3, flightResponse.BasePrice);
+            Assert.Equal(AvailableSeats3, flightResponse.AvailableSeats);
+            Assert.Equal(IsSpecialOffer3, flightResponse.IsSpecialOffer);
+        }
+
+        [Fact]
+        public async Task PostReturnsBadRequestResultWhenFlightIsNull()
+        {
+            // Arrange
+            var flightController = new FlightsController(m_FlightRepository);
+            var flightRequest = new FlightRequest { Flight = null };
+
+            // Act
+            IActionResult result = await flightController.Post(flightRequest).ConfigureAwait(false);
+
+            // Assert
+            Assert.IsType<BadRequestResult>(result);
+        }
+
+        #endregion
+
+        #region PutFlight
+
+        [Fact]
+        public async Task PutReturnsNotFoundResponseWhenIdDoesNotExist()
+        {
+            // Arrange
+            var flightController = new FlightsController(m_FlightRepository);
+            var flightDto = new FlightDto
+            {
+                Id = new Guid(Guid3),
+                DepartureLocation = DepartureLocation3,
+                ArrivalLocation = ArrivalLocation3,
+                Date = Date3,
+                BasePrice = BasePrice3,
+                AvailableSeats = AvailableSeats3,
+                IsSpecialOffer = IsSpecialOffer3
+            };
+            var flightRequest = new FlightRequest { Flight = flightDto };
+            
+            // Act
+            IActionResult result = await flightController.Put(new Guid(Guid3), flightRequest).ConfigureAwait(false);
+            var parsedResult = result as NotFoundResult;
+
+            // Assert
+            Assert.IsType<NotFoundResult>(result);
+            Assert.True(parsedResult.StatusCode == 404);
+        }
+
+        [Fact]
+        public async Task PutReturnsOkResponseWhenExistingFlightIsUpdated()
+        {
+            // Arrange
+            var flightController = new FlightsController(m_FlightRepository);
+            var flightDto = new FlightDto
+            {
+                Id = new Guid(Guid3),
+                DepartureLocation = DepartureLocation3,
+                ArrivalLocation = ArrivalLocation3,
+                Date = Date3,
+                BasePrice = BasePrice3,
+                AvailableSeats = AvailableSeats3,
+                IsSpecialOffer = IsSpecialOffer3
+            };
+            var flightRequest = new FlightRequest { Flight = flightDto };
+            var flightGuid = new Guid(Guid2);
+
+            // Act
+            IActionResult result = await flightController.Put(flightGuid, flightRequest).ConfigureAwait(false);
+            var parsedResult = result as OkObjectResult;
+
+            // Assert
+            Assert.IsType<OkObjectResult>(result);
+            Assert.True(parsedResult.StatusCode == 200);
+
+            var response = Assert.IsType<FlightResponse>(parsedResult.Value);
+            Assert.IsType<FlightDto>(response.Flight);
+
+            Flight flightResponse = m_Flights.Single(x => x.Id == flightGuid);
+
+            Assert.Equal(DepartureLocation3, flightResponse.DepartureLocation);
+            Assert.Equal(ArrivalLocation3, flightResponse.ArrivalLocation);
+            Assert.Equal(Date3, flightResponse.Date);
+            Assert.Equal(BasePrice3, flightResponse.BasePrice);
+            Assert.Equal(AvailableSeats3, flightResponse.AvailableSeats);
+            Assert.Equal(IsSpecialOffer3, flightResponse.IsSpecialOffer);
+        }
+
+        [Fact]
+        public async Task PutReturnsBadRequestWhenFlightIsNull()
+        {
+            // Arrange
+            var flightController = new FlightsController(m_FlightRepository);
+            var flightRequest = new FlightRequest { Flight = null };
+
+            // Act
+            IActionResult result = await flightController.Put(new Guid(Guid3), flightRequest).ConfigureAwait(false);
+            var parsedResult = result as BadRequestResult;
+
+            // Assert
+            Assert.IsType<BadRequestResult>(result);
+            Assert.True(parsedResult.StatusCode == 400);
+        }
+
+        [Fact]
+        public async Task PutReturnsNotFoundWhenIdIsNull()
+        {
+            // Arrange
+            var flightController = new FlightsController(m_FlightRepository);
+            var flightDto = new FlightDto
+            {
+                Id = new Guid(Guid3),
+                DepartureLocation = DepartureLocation3,
+                ArrivalLocation = ArrivalLocation3,
+                Date = Date3,
+                BasePrice = BasePrice3,
+                AvailableSeats = AvailableSeats3,
+                IsSpecialOffer = IsSpecialOffer3
+            };
+            var flightRequest = new FlightRequest { Flight = flightDto };
+
+            // Act
+            IActionResult result = await flightController.Put(Guid.Empty, flightRequest).ConfigureAwait(false);
+            var parsedResult = result as NotFoundResult;
+
+            // Assert
+            Assert.IsType<NotFoundResult>(result);
+            Assert.True(parsedResult.StatusCode == 404);
+        }
+
+        #endregion
+
+        #region DeleteFlight
+
+        [Fact]
+        public async Task DeleteReturnsNotFoundResponseWhenIdDoesNotExist()
+        {
+            // Arrange
+            var flightController = new FlightsController(m_FlightRepository);
+
+            // Act
+            IActionResult result = await flightController.Delete(new Guid(Guid3)).ConfigureAwait(false);
+            var parsedResult = result as NotFoundResult;
+
+            // Assert
+            Assert.IsType<NotFoundResult>(result);
+            Assert.True(parsedResult.StatusCode == 404);
+        }
+
+        [Fact]
+        public async Task DeleteReturnsOkResponseWhenExistingFlightDeleted()
+        {
+            // Arrange
+            var flightController = new FlightsController(m_FlightRepository);
+            var flightGuid = new Guid(Guid2);
+            Flight flight = m_Flights.Single(x => x.Id == flightGuid);
+
+            // Act
+            IActionResult result = await flightController.Delete(flightGuid).ConfigureAwait(false);
+            var parsedResult = result as OkResult;
+
+            // Assert
+            Assert.IsType<OkResult>(result);
+            Assert.DoesNotContain(flight, m_Flights);
+            Assert.Single(m_Flights);
         }
 
         #endregion

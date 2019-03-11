@@ -85,7 +85,7 @@ namespace FlightsService.Controllers
 
             Flight newFlight = flightRequest.Flight.ToFlight();
             newFlight.Id = Guid.NewGuid();
-            var insertedFlight = await m_FlightRepository.InsertAsync(await GetHydratedFlightAsync(flightRequest.Flight));
+            var insertedFlight = await m_FlightRepository.InsertAsync(newFlight);
 
             var response = new FlightResponse { Flight = insertedFlight.ToFlightDto() };
             return Ok(response);
@@ -114,7 +114,9 @@ namespace FlightsService.Controllers
             Flight flight = await GetHydratedFlightAsync(flightRequest.Flight);
             await m_FlightRepository.UpdateAsync(flight);
 
-            return Ok(flight);
+            var response = new FlightResponse { Flight = flight.ToFlightDto() };
+
+            return Ok(response);
         }
 
         // DELETE: api/v1/flights/{flightId}
