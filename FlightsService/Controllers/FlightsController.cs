@@ -86,7 +86,6 @@ namespace FlightsService.Controllers
             Flight newFlight = flightRequest.Flight.ToFlight();
             newFlight.Id = Guid.NewGuid();
             var insertedFlight = await m_FlightRepository.InsertAsync(newFlight);
-
             var response = new FlightResponse { Flight = insertedFlight.ToFlightDto() };
             return Ok(response);
         }
@@ -137,7 +136,6 @@ namespace FlightsService.Controllers
 
             return Ok();
         }
-
 
         private async Task<Flight> GetHydratedFlightAsync(FlightDto dto)
         {
