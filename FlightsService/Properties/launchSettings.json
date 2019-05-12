@@ -8,17 +8,8 @@
     }
   },
   "profiles": {
-    "IIS Express": {
-      "commandName": "IISExpress",
-      "launchBrowser": true,
-      "launchUrl": "api/v1/flights",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      }
-    },
     "FlightsService": {
       "commandName": "Project",
-      "launchUrl": "api/v1/flights",
       "applicationUrl": "http://localhost:5000/"
     }
   }

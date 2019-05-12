@@ -11,6 +11,10 @@ using FlightsService.Models;
 using EventDispatcher.Azure;
 using Microsoft.Extensions.Logging;
 using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
+using System.IO;
+using System;
+using System.Reflection;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace FlightsService
 {
@@ -46,15 +50,33 @@ namespace FlightsService
 
                     return new IncomingMessageService<Booking>(logger, eventReceiver, flightRepository);
                 });
+
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new Info
+                {
+                    Version = "v1",
+                    Title = "Flight Service API",
+                    Description = "Simple API to perform CRUDs on Flights",
+                });
+
+                // Set the comments path for the Swagger JSON and UI.
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                c.IncludeXmlComments(xmlPath);
+
+                c.DescribeAllParametersInCamelCase();
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            if (env.IsDevelopment())
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
             {
-                app.UseDeveloperExceptionPage();
-            }
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Booking Service API V1");
+            });
 
             app.UseMvc();
         }

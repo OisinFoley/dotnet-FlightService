@@ -13,6 +13,7 @@ using System;
 
 namespace FlightsService.Controllers
 {
+    [ApiController]
     public class FlightsController : Controller
     {
         private readonly IFlightRepository m_FlightRepository;
@@ -22,7 +23,9 @@ namespace FlightsService.Controllers
             m_FlightRepository = flightRepository;
         }
 
-        // GET api/v1/flights
+        /// <summary>
+        /// Retrieves all Flights matching the provided property parameters.
+        /// </summary>
         [HttpGet("api/v1/flights")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -35,9 +38,11 @@ namespace FlightsService.Controllers
             IEnumerable<Flight> flights = await m_FlightRepository.GetFlights();
 
             if (!string.IsNullOrEmpty(departureLocation))
-                flights = flights.Where(f => f.DepartureLocation.Contains(departureLocation));
+                flights = flights
+                    .Where(f => f.DepartureLocation.ToUpper().Contains(departureLocation.ToUpper()));
             if (!string.IsNullOrEmpty(arrivalLocation))
-                flights = flights.Where(f => f.ArrivalLocation.Contains(arrivalLocation));
+                flights = flights
+                    .Where(f => f.ArrivalLocation.ToUpper().Contains(arrivalLocation.ToUpper()));
             if (!string.IsNullOrEmpty(date))
                 flights = flights.Where(f => f.Date.Equals(date));
             if (basePrice > 0)
@@ -51,7 +56,9 @@ namespace FlightsService.Controllers
             return Ok(response);
         }
 
-        // GET api/v1/flights/{flightId}
+        /// <summary>
+        /// Retrieves a specific Flight.
+        /// </summary>
         [HttpGet("api/v1/flights/{id}")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -71,7 +78,9 @@ namespace FlightsService.Controllers
             return Ok(response);
         }
 
-        // POST api/v1/flights
+        /// <summary>
+        /// Adds a new Flight.
+        /// </summary>
         [HttpPost("api/v1/flights")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -90,7 +99,9 @@ namespace FlightsService.Controllers
             return Ok(response);
         }
 
-        // PUT: api/v1/flights/{flightId}
+        /// <summary>
+        /// Updates a specific existing Flight.
+        /// </summary>
         [HttpPut("api/v1/flights/{id}")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -118,7 +129,9 @@ namespace FlightsService.Controllers
             return Ok(response);
         }
 
-        // DELETE: api/v1/flights/{flightId}
+        /// <summary>
+        /// Deletes a specific Flight.
+        /// </summary>
         [HttpDelete("api/v1/flights/{id}")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK)]
