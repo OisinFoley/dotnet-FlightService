@@ -97,7 +97,7 @@ namespace FlightsService.Tests
 
             Assert.Equal(2, response.Flights.Count());
 
-            FlightDto flight1 = response.Flights.Single(x => x.Id.ToString() == Guid1);
+            FlightResponseDto flight1 = response.Flights.Single(x => x.Id.ToString() == Guid1);
             Assert.Equal(DepartureLocation1, flight1.DepartureLocation);
             Assert.Equal(ArrivalLocation1, flight1.ArrivalLocation);
             Assert.Equal(IsSpecialOffer1, flight1.IsSpecialOffer);
@@ -105,7 +105,7 @@ namespace FlightsService.Tests
             Assert.Equal(Date1, flight1.Date);
             Assert.Equal(BasePrice1, flight1.BasePrice);
 
-            FlightDto flight2 = response.Flights.Single(x => x.Id.ToString() == Guid2);
+            FlightResponseDto flight2 = response.Flights.Single(x => x.Id.ToString() == Guid2);
             Assert.Equal(DepartureLocation2, flight2.DepartureLocation);
             Assert.Equal(ArrivalLocation2, flight2.ArrivalLocation);
             Assert.Equal(IsSpecialOffer2, flight2.IsSpecialOffer);
@@ -131,7 +131,7 @@ namespace FlightsService.Tests
 
             Assert.Single(response.Flights);
 
-            FlightDto flight1 = response.Flights.Single(x => x.Id.ToString() == Guid1);
+            FlightResponseDto flight1 = response.Flights.Single(x => x.Id.ToString() == Guid1);
             Assert.Equal(DepartureLocation1, flight1.DepartureLocation);
             Assert.Equal(ArrivalLocation1, flight1.ArrivalLocation);
             Assert.Equal(IsSpecialOffer1, flight1.IsSpecialOffer);
@@ -214,7 +214,7 @@ namespace FlightsService.Tests
 
             var response = Assert.IsType<FlightResponse>((parsedResult.Value));
 
-            FlightDto flight2 = response.Flight;
+            FlightResponseDto flight2 = response.Flight;
             Assert.Equal(DepartureLocation2, flight2.DepartureLocation);
             Assert.Equal(ArrivalLocation2, flight2.ArrivalLocation);
             Assert.Equal(IsSpecialOffer2, flight2.IsSpecialOffer);
@@ -232,7 +232,8 @@ namespace FlightsService.Tests
         {
             // Arrange
             var flightController = new FlightsController(m_FlightRepository);
-            var flightDto = new FlightDto { Id = new Guid(Guid3),
+            var flightDto = new FlightRequestDto
+            {
                 DepartureLocation = DepartureLocation3,
                 ArrivalLocation = ArrivalLocation3,
                 Date = Date3,
@@ -251,7 +252,7 @@ namespace FlightsService.Tests
             Assert.True(parsedResult.StatusCode == 200);
 
             var response = Assert.IsType<FlightResponse>((parsedResult.Value));
-            var flightResponse = Assert.IsType<FlightDto>(response.Flight);
+            var flightResponse = Assert.IsType<FlightResponseDto>(response.Flight);
             Assert.NotEqual(Guid.Empty, flightResponse.Id);
             Assert.Equal(DepartureLocation3, flightResponse.DepartureLocation);
             Assert.Equal(ArrivalLocation3, flightResponse.ArrivalLocation);
@@ -284,9 +285,8 @@ namespace FlightsService.Tests
         {
             // Arrange
             var flightController = new FlightsController(m_FlightRepository);
-            var flightDto = new FlightDto
+            var flightDto = new FlightRequestDto
             {
-                Id = new Guid(Guid3),
                 DepartureLocation = DepartureLocation3,
                 ArrivalLocation = ArrivalLocation3,
                 Date = Date3,
@@ -295,7 +295,7 @@ namespace FlightsService.Tests
                 IsSpecialOffer = IsSpecialOffer3
             };
             var flightRequest = new FlightRequest { Flight = flightDto };
-            
+
             // Act
             IActionResult result = await flightController.Put(new Guid(Guid3), flightRequest).ConfigureAwait(false);
             var parsedResult = result as NotFoundResult;
@@ -310,9 +310,8 @@ namespace FlightsService.Tests
         {
             // Arrange
             var flightController = new FlightsController(m_FlightRepository);
-            var flightDto = new FlightDto
+            var flightDto = new FlightRequestDto
             {
-                Id = new Guid(Guid3),
                 DepartureLocation = DepartureLocation3,
                 ArrivalLocation = ArrivalLocation3,
                 Date = Date3,
@@ -332,7 +331,7 @@ namespace FlightsService.Tests
             Assert.True(parsedResult.StatusCode == 200);
 
             var response = Assert.IsType<FlightResponse>(parsedResult.Value);
-            Assert.IsType<FlightDto>(response.Flight);
+            Assert.IsType<FlightResponseDto>(response.Flight);
 
             Flight flightResponse = m_Flights.Single(x => x.Id == flightGuid);
 
@@ -365,9 +364,8 @@ namespace FlightsService.Tests
         {
             // Arrange
             var flightController = new FlightsController(m_FlightRepository);
-            var flightDto = new FlightDto
+            var flightDto = new FlightRequestDto
             {
-                Id = new Guid(Guid3),
                 DepartureLocation = DepartureLocation3,
                 ArrivalLocation = ArrivalLocation3,
                 Date = Date3,

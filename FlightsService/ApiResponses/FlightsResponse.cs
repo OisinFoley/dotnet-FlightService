@@ -5,6 +5,6 @@ namespace FlightsService.ApiResponses
 {
     public sealed class FlightsResponse
     {
-        public IEnumerable<FlightDto> Flights { get; set; }
+        public IEnumerable<FlightResponseDto> Flights { get; set; }
     }
 }

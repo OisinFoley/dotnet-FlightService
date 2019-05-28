@@ -5,7 +5,7 @@ namespace FlightsService.Extensions
 {
     public static class ConverterExtension
     {
-        public static FlightDto ToFlightDto(this Flight flight) => new FlightDto
+        public static FlightResponseDto ToFlightResponseDto(this Flight flight) => new FlightResponseDto
         {
             Id = flight.Id,
             DepartureLocation = flight.DepartureLocation,
@@ -17,7 +17,7 @@ namespace FlightsService.Extensions
         };
 
         public static Flight ToFlight(
-            this FlightDto dto,
+            this FlightRequestDto dto,
             Flight existingFlight = null)
         {
 
