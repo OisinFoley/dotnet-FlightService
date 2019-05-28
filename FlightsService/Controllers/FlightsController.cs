@@ -28,7 +28,7 @@ namespace FlightsService.Controllers
         /// </summary>
         [HttpGet("api/v1/flights")]
         [Produces("application/json")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(FlightsResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Get(string departureLocation, 
             string arrivalLocation, 
@@ -50,7 +50,7 @@ namespace FlightsService.Controllers
 
             var response = new FlightsResponse
             {
-                Flights = flights.Select(flight => flight.ToFlightDto())
+                Flights = flights.Select(flight => flight.ToFlightResponseDto())
             };
 
             return Ok(response);
@@ -61,7 +61,7 @@ namespace FlightsService.Controllers
         /// </summary>
         [HttpGet("api/v1/flights/{id}")]
         [Produces("application/json")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(FlightResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Get(Guid id)
         {
@@ -74,7 +74,7 @@ namespace FlightsService.Controllers
             if (flight == null)
                 return NotFound();
 
-            var response = new FlightResponse { Flight = flight.ToFlightDto() };
+            var response = new FlightResponse { Flight = flight.ToFlightResponseDto() };
             return Ok(response);
         }
 
@@ -83,7 +83,7 @@ namespace FlightsService.Controllers
         /// </summary>
         [HttpPost("api/v1/flights")]
         [Produces("application/json")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(FlightResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Post([FromBody] FlightRequest flightRequest)
         {
@@ -93,9 +93,11 @@ namespace FlightsService.Controllers
             }
 
             Flight newFlight = flightRequest.Flight.ToFlight();
+
             newFlight.Id = Guid.NewGuid();
             var insertedFlight = await m_FlightRepository.InsertAsync(newFlight);
-            var response = new FlightResponse { Flight = insertedFlight.ToFlightDto() };
+
+            var response = new FlightResponse { Flight = insertedFlight.ToFlightResponseDto() };
             return Ok(response);
         }
 
@@ -104,7 +106,7 @@ namespace FlightsService.Controllers
         /// </summary>
         [HttpPut("api/v1/flights/{id}")]
         [Produces("application/json")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(FlightResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Put(Guid id, [FromBody] FlightRequest flightRequest)
@@ -114,17 +116,21 @@ namespace FlightsService.Controllers
                 return new BadRequestResult();
             }
 
-            flightRequest.Flight.Id = id;
-
-            if (!(m_FlightRepository.Flights.Any(x => x.Id == flightRequest.Flight.Id)))
+            Flight flight = m_FlightRepository.Flights.SingleOrDefault(x => x.Id == id);
+            if (flight == null)
             {
                 return NotFound();
             }
 
-            Flight flight = await GetHydratedFlightAsync(flightRequest.Flight);
-            await m_FlightRepository.UpdateAsync(flight);
-
-            var response = new FlightResponse { Flight = flight.ToFlightDto() };
+            flight.ArrivalLocation = flightRequest.Flight.ArrivalLocation;
+            flight.AvailableSeats = flightRequest.Flight.AvailableSeats;
+            flight.BasePrice = flightRequest.Flight.BasePrice;
+            flight.Date = flightRequest.Flight.Date;
+            flight.DepartureLocation = flightRequest.Flight.DepartureLocation;
+            flight.IsSpecialOffer = flightRequest.Flight.IsSpecialOffer;
+            
+            var flightResponse = await m_FlightRepository.UpdateAsync(flight);
+            var response = new FlightResponse { Flight = flight.ToFlightResponseDto() };
 
             return Ok(response);
         }
@@ -148,12 +154,6 @@ namespace FlightsService.Controllers
             await m_FlightRepository.DeleteAsync(flight);
 
             return Ok();
-        }
-
-        private async Task<Flight> GetHydratedFlightAsync(FlightDto dto)
-        {
-            Flight flight = await m_FlightRepository.FindAsync(dto.Id);
-            return dto.ToFlight(flight);
         }
     }
 }

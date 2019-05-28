@@ -4,6 +4,6 @@ namespace FlightsService.ApiResponses
 {
     public class FlightResponse
     {
-        public FlightDto Flight { get; set; }
+        public FlightResponseDto Flight { get; set; }
     }
 }
