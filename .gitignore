@@ -4,4 +4,6 @@ FlightsService/appsettings.json
 FlightsService/appsettings.Development.json
 FlightsService.Tests/obj
 FlightsService.Tests/bin
+client/FlightService.Client/FlightService.Client/FlightService.Client/bin
+client/FlightService.Client/FlightService.Client/FlightService.Client/obj
 .vs/
