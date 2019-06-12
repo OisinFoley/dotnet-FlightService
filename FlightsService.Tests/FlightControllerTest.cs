@@ -14,7 +14,6 @@ using Xunit;
 
 namespace FlightsService.Tests
 {
-    
     public class FlightControllerTest
     {
         private readonly IFlightRepository m_FlightRepository;

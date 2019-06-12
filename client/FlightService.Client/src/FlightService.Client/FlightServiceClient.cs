@@ -6,7 +6,6 @@ namespace FlightService.Client
     {
         public FlightsServiceClient()
         {
-            BaseUri = new Uri("http://localhost:5000");
         }
     }
 }

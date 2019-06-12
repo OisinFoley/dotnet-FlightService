@@ -34,8 +34,8 @@ namespace FlightsService
 
             services
                 .AddDbContext<ApplicationContext>(options => ApplicationContextConfigurator.SetContextOptions(options, Configuration))
-                .AddScoped<IFlightRepository, FlightRepository>()
-                .AddScoped<IUnitOfWork, ApplicationContext>();
+                .AddTransient<IFlightRepository, FlightRepository>()
+                .AddTransient<IUnitOfWork, ApplicationContext>();
 
             services.AddSingleton<IHostedService, IncomingMessageService<Booking>>(
                 serviceProvider =>
