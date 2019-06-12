@@ -63,6 +63,7 @@ namespace FlightsService.Controllers
         [Produces("application/json")]
         [ProducesResponseType(typeof(FlightResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Get(Guid id)
         {
             if (id == Guid.Empty)
